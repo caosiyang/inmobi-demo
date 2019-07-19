@@ -41,8 +41,8 @@ class InmobiJsonClient(object):
     def call(self, query):
         """ Query.
         """
-        #if self.__credential is None:
-        #    raise RuntimeError('no invalid session')
+        if self.__credential is None:
+            raise RuntimeError('no valid session')
         headers = {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
@@ -51,6 +51,7 @@ class InmobiJsonClient(object):
                 'accountId': self.__accountId,
                 }
         resp = requests.post('https://api.inmobi.com/v3.0/reporting/publisher', headers=headers, data=query)
+        resp.close()
         if resp.status_code == 200:
             return resp.json()
         return None
