@@ -120,15 +120,19 @@ def parse_args():
     return args.date
 
 
-config_file = './config.json'
-session_file = './session.json'
+config_filename = 'config.json'
+session_filename = 'session.json'
 
 
 if __name__ == '__main__':
     date = parse_args()
     print 'date: %s' % date
 
-    cli = InmobiJsonClient(config_file, session_file)
+    proj_dir = os.path.dirname(os.path.realpath(sys.argv[0]))
+    config_filepath = os.path.join(proj_dir, config_filename)
+    session_filepath = os.path.join(proj_dir, session_filename)
+
+    cli = InmobiJsonClient(config_filepath, session_filepath)
     cli.load_session()
 
     query = {}  # TODO
