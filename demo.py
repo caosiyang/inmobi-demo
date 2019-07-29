@@ -83,7 +83,6 @@ class InmobiJsonClient(object):
     def call(self, query):
         """ Query.
         """
-        print 'query:\n%s' % json.dumps(query)
         headers = {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
@@ -120,6 +119,43 @@ def parse_args():
     return args.date
 
 
+def build_query(date):
+    time_frame = ''
+    if len(date) == 1:
+        time_frame = '%s-%s-%s:%s-%s-%s' % (date[0][:4], date[0][4:6], date[0][6:],
+                                            date[0][:4], date[0][4:6], date[0][6:])
+    elif len(date) == 2:
+        time_frame = '%s-%s-%s:%s-%s-%s' % (date[0][:4], date[0][4:6], date[0][6:],
+                                            date[1][:4], date[1][4:6], date[1][6:])
+    else:
+        raise RuntimeError('invalid date: %s' % date)
+
+    query = {
+            'reportRequest': {
+                'metrics': [
+                    'adRequests',
+                    'adImpressions',
+                    'clicks',
+                    'earnings',
+                    'servedImpressions',
+                    'costPerMille',
+                    'fillRate'
+                    ],
+                'groupBy': [
+                    'country',
+                    'requestSlot',
+                    'platform',
+                    'date',
+                    'account',
+                    'inmobiAppId',
+                    'placement'
+                    ],
+                'timeFrame': time_frame,
+                }
+            }
+    return query
+
+
 config_filename = 'config.json'
 session_filename = 'session.json'
 
@@ -135,10 +171,11 @@ if __name__ == '__main__':
     cli = InmobiJsonClient(config_filepath, session_filepath)
     cli.load_session()
 
-    query = {}  # TODO
-    # query = {"reportRequest":{"metrics":["adImpressions"],"timeFrame":"2019-07-20:2019-07-23","groupBy":["date"], "filterBy":[{ "filterName":"adImpressions", "filterValue": 0, "comparator":">"}]}}
-
+    query = build_query(date)
+    print '==== query:\n%s' % json.dumps(query, indent=4)
     res = cli.call(query)
-    print "result:\n%s" % res
+    if not res:
+        sys.stderr.write('query failed')
+    print "==== result:\n%s" % json.dumps(res, indent=4)
 
     sys.exit(0)
