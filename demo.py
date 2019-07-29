@@ -99,17 +99,35 @@ class InmobiJsonClient(object):
 
 
 def parse_args():
-    # TODO
-    parser = argparse.ArgumentParser(description='Query with Inmobi.')
-    parser.add_argument('--from', help='')
-    parser.add_argument('--to', help='')
+    """ Parse arguments and return a list of date.
+    """
+    parser = argparse.ArgumentParser(description='Inmobi query tools.')
+    parser.add_argument('-d', '--date', dest='date', nargs='*', type=str, required=True, help='specify one day or date range with format "YYYYmmdd"')
     args = parser.parse_args()
+
+    # validate
+    if len(args.date) == 0:
+        sys.stderr.write("ERROR: '--date' option: no value specified")
+        sys.exit(1)
+    if len(args.date) > 2:
+        sys.stderr.write("ERROR: '--date' option: too many value specified")
+        sys.exit(1)
+    for s in args.date:
+        if len(s) != 8 or not s.isdigit():
+            sys.stderr.write("ERROR: '--date' option: invalid value '%s'" % s)
+            sys.exit(1)
+
+    return args.date
 
 
 config_file = './config.json'
 session_file = './session.json'
 
+
 if __name__ == '__main__':
+    date = parse_args()
+    print 'date: %s' % date
+
     cli = InmobiJsonClient(config_file, session_file)
     cli.load_session()
 
