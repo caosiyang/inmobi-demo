@@ -17,6 +17,7 @@ class InmobiJsonClient(object):
         self.__config_file = config_file
         self.__session_file = session_file
 
+        self.__auth_passed = False
         self.__sessionId = None
         self.__accountId = None
         self.__secretKey = None
@@ -63,6 +64,7 @@ class InmobiJsonClient(object):
             self.__sessionId = session['sessionId']
             self.__accountId = session['accountId']
             self.__secretKey = session['secretKey']
+            self.__auth_passed = True
             print 'load session: %s' % session
 
     @classmethod
@@ -83,6 +85,8 @@ class InmobiJsonClient(object):
     def call(self, query):
         """ Query.
         """
+        if not self.__auth_passed:
+            raise RuntimeError('not authenticated, load session first')
         headers = {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
