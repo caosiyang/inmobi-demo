@@ -178,8 +178,8 @@ if __name__ == '__main__':
     query = build_query(date)
     print '==== query:\n%s' % json.dumps(query, indent=4)
     res = cli.call(query)
-    if not res:
+    if res is None:
         sys.stderr.write('query failed')
+        sys.exit(1)
     print "==== result:\n%s" % json.dumps(res, indent=4)
-
     sys.exit(0)
